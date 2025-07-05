@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Practice Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Music Practice Tool</h1>
+
+    <div id="metronome">
+        <h2>Metronome</h2>
+        <div id="visual-metronome"></div>
+        <div class="controls">
+            <label for="bpm">BPM:</label>
+            <input type="number" id="bpm" value="120" min="40" max="240">
+            <label for="time-signature">Time Signature:</label>
+            <select id="time-signature">
+                <option value="4/4" selected>4/4</option>
+                <option value="3/4">3/4</option>
+                <option value="2/4">2/4</option>
+                <option value="6/8">6/8</option>
+            </select>
+            <button id="start-stop">Start</button>
+            <label for="volume">Volume:</label>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
+        </div>
+    </div>
+
+    <div id="scale-randomizer">
+        <h2>Scale Randomizer</h2>
+        <button id="randomize-scale">Get Random Scale</button>
+        <p id="scale-display"></p>
+    </div>
+
+    <div id="key-selection">
+        <h2>Key</h2>
+        <div class="controls">
+            <label for="key-select">Select Key:</label>
+            <select id="key-select">
+                <optgroup label="Major Keys">
+                    <option value="C">C</option>
+                    <option value="G">G</option>
+                    <option value="D">D</option>
+                    <option value="A">A</option>
+                    <option value="E">E</option>
+                    <option value="B">B</option>
+                    <option value="F#">F#</option>
+                    <option value="C#">C#</option>
+                    <option value="F">F</option>
+                    <option value="Bb">Bb</option>
+                    <option value="Eb">Eb</option>
+                    <option value="Ab">Ab</option>
+                </optgroup>
+                <optgroup label="Minor Keys">
+                    <option value="Am">Am</option>
+                    <option value="Em">Em</option>
+                    <option value="Bm">Bm</option>
+                    <option value="F#m">F#m</option>
+                    <option value="C#m">C#m</option>
+                    <option value="G#m">G#m</option>
+                    <option value="D#m">D#m</option>
+                    <option value="A#m">A#m</option>
+                    <option value="Dm">Dm</option>
+                    <option value="Gm">Gm</option>
+                    <option value="Cm">Cm</option>
+                    <option value="Fm">Fm</option>
+                </optgroup>
+            </select>
+        </div>
+    </div>
+
+    <div id="diatonic-chords">
+        <h2>Diatonic Chords</h2>
+        <ul id="chord-list"></ul>
+    </div>
+
+    <div id="synced-chord-randomizer">
+        <h2>Synced Chord Randomizer</h2>
+        <div class="controls">
+            <label for="beats-per-chord">Beats Per Chord:</label>
+            <input type="number" id="beats-per-chord" value="4" min="1">
+            <button id="start-stop-synced">Start</button>
+        </div>
+        <p id="synced-chord-display"></p>
+    </div>
+
+    <div id="chord-modal" class="modal">
+        <div class="modal-content">
+            <p id="modal-chord-display"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
