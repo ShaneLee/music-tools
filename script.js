@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTick() {
-        // Create a buffer source for the click sound
         const buffer = audioContext.createBuffer(1, 4096, audioContext.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < 4096; i++) {
@@ -22,22 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const source = audioContext.createBufferSource();
         source.buffer = buffer;
 
-        // Create a gain node for volume control
         const gainNode = audioContext.createGain();
         gainNode.gain.setValueAtTime(volumeSlider.value, audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
-
 
         source.connect(gainNode);
         gainNode.connect(audioContext.destination);
         source.start(audioContext.currentTime);
         source.stop(audioContext.currentTime + 0.05);
 
-        // Update visual metronome
         updateVisualMetronome();
 
-
-        // Handle synced chord randomizer
         if (isSyncedRandomizerOn) {
             const beatsPerChord = parseInt(beatsPerChordInput.value);
             if (beatCount % beatsPerChord === 0) {
@@ -76,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isMetronomeOn) {
             clearInterval(metronomeInterval);
             startStopButton.textContent = 'Start';
-            // Stop synced randomizer if metronome is stopped
             if (isSyncedRandomizerOn) {
                 isSyncedRandomizerOn = false;
                 startStopSyncedButton.textContent = 'Start';
@@ -87,13 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const interval = 60000 / bpm;
             metronomeInterval = setInterval(playTick, interval);
             startStopButton.textContent = 'Stop';
-            beatCount = 0; // Reset beat count when starting
+            beatCount = 0;
         }
         isMetronomeOn = !isMetronomeOn;
     });
 
-
-    // Scale Randomizer
     const randomizeScaleButton = document.getElementById('randomize-scale');
     const scaleDisplay = document.getElementById('scale-display');
     const scales = [
@@ -108,8 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         scaleDisplay.textContent = scales[randomIndex];
     });
 
-
-    // Key Selection and Chords
     const keySelect = document.getElementById('key-select');
     const chordList = document.getElementById('chord-list');
     const beatsPerChordInput = document.getElementById('beats-per-chord');
@@ -121,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSyncedRandomizerOn = false;
 
     const chordsInKey = {
-        // Major Keys
         "C": [{name:"C",numeral:"I"},{name:"Dm",numeral:"ii"},{name:"Em",numeral:"iii"},{name:"F",numeral:"IV"},{name:"G",numeral:"V"},{name:"Am",numeral:"vi"},{name:"Bdim",numeral:"vii°"}],
         "G": [{name:"G",numeral:"I"},{name:"Am",numeral:"ii"},{name:"Bm",numeral:"iii"},{name:"C",numeral:"IV"},{name:"D",numeral:"V"},{name:"Em",numeral:"vi"},{name:"F#dim",numeral:"vii°"}],
         "D": [{name:"D",numeral:"I"},{name:"Em",numeral:"ii"},{name:"F#m",numeral:"iii"},{name:"G",numeral:"IV"},{name:"A",numeral:"V"},{name:"Bm",numeral:"vi"},{name:"C#dim",numeral:"vii°"}],
@@ -134,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         "Bb": [{name:"Bb",numeral:"I"},{name:"Cm",numeral:"ii"},{name:"Dm",numeral:"iii"},{name:"Eb",numeral:"IV"},{name:"F",numeral:"V"},{name:"Gm",numeral:"vi"},{name:"Adim",numeral:"vii°"}],
         "Eb": [{name:"Eb",numeral:"I"},{name:"Fm",numeral:"ii"},{name:"Gm",numeral:"iii"},{name:"Ab",numeral:"IV"},{name:"Bb",numeral:"V"},{name:"Cm",numeral:"vi"},{name:"Ddim",numeral:"vii°"}],
         "Ab": [{name:"Ab",numeral:"I"},{name:"Bbm",numeral:"ii"},{name:"Cm",numeral:"iii"},{name:"Db",numeral:"IV"},{name:"Eb",numeral:"V"},{name:"Fm",numeral:"vi"},{name:"Gdim",numeral:"vii°"}],
-        // Minor Keys
         "Am": [{name:"Am",numeral:"i"},{name:"Bdim",numeral:"ii°"},{name:"C",numeral:"III"},{name:"Dm",numeral:"iv"},{name:"Em",numeral:"v"},{name:"F",numeral:"VI"},{name:"G",numeral:"VII"}],
         "Em": [{name:"Em",numeral:"i"},{name:"F#dim",numeral:"ii°"},{name:"G",numeral:"III"},{name:"Am",numeral:"iv"},{name:"Bm",numeral:"v"},{name:"C",numeral:"VI"},{name:"D",numeral:"VII"}],
         "Bm": [{name:"Bm",numeral:"i"},{name:"C#dim",numeral:"ii°"},{name:"D",numeral:"III"},{name:"Em",numeral:"iv"},{name:"F#m",numeral:"v"},{name:"G",numeral:"VI"},{name:"A",numeral:"VII"}],
@@ -166,6 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const randomIndex = Math.floor(Math.random() * chords.length);
         const chord = chords[randomIndex];
         modalChordDisplay.textContent = `${chord.name} (${chord.numeral})`;
+        // Set the chord to be verified by MIDI
+        setChordForVerification(chord.name);
     }
 
     keySelect.addEventListener('change', updateDiatonicChords);
@@ -175,11 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isSyncedRandomizerOn) {
             startStopSyncedButton.textContent = 'Stop';
-            beatCount = 0; // Reset beat count
-            updateSyncedChord(); // Show first chord immediately
+            beatCount = 0;
+            updateSyncedChord();
             chordModal.style.display = "block";
             if (!isMetronomeOn) {
-                startStopButton.click(); // Start metronome if not already on
+                startStopButton.click();
             }
         } else {
             startStopSyncedButton.textContent = 'Start';
@@ -187,7 +176,162 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // MIDI Controls
+    const midiInputSelect = document.getElementById('midi-input-select');
+    const midiStatus = document.getElementById('midi-status');
+    const playedNotes = document.getElementById('played-notes');
+    const chordVerification = document.getElementById('chord-verification');
+
+    let midiAccess;
+    let activeInput = null;
+    let currentlyPressedNotes = new Set();
+    let chordToVerify = null;
+
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+    const chordFormulas = {
+        "Major": [0, 4, 7],
+        "Minor": [0, 3, 7],
+        "Diminished": [0, 3, 6],
+    };
+
+    function onMIDISuccess(midi) {
+        midiAccess = midi;
+        midiStatus.textContent = 'MIDI Ready!';
+        populateMidiInputList();
+        midiAccess.onstatechange = onMIDIStateChange;
+    }
+
+    function onMIDIFailure() {
+        midiStatus.textContent = 'Failed to access MIDI devices. Please ensure you are on a secure connection (HTTPS) and have granted permission.';
+    }
+
+    function onMIDIStateChange(event) {
+        if (event.port.type === "input") {
+            populateMidiInputList();
+        }
+    }
+
+    function populateMidiInputList() {
+        midiInputSelect.innerHTML = '';
+        if (midiAccess.inputs.size > 0) {
+            midiAccess.inputs.forEach(input => {
+                const option = document.createElement('option');
+                option.value = input.id;
+                option.textContent = input.name;
+                midiInputSelect.appendChild(option);
+            });
+            if (activeInput) {
+                midiInputSelect.value = activeInput.id;
+            }
+            setActiveMidiInput(midiInputSelect.value);
+        } else {
+            const option = document.createElement('option');
+            option.textContent = 'No MIDI input devices found';
+            midiInputSelect.appendChild(option);
+        }
+    }
+
+    function setActiveMidiInput(inputId) {
+        if (activeInput) {
+            activeInput.onmidimessage = null;
+        }
+        activeInput = midiAccess.inputs.get(inputId);
+        if (activeInput) {
+            activeInput.onmidimessage = onMIDIMessage;
+        }
+    }
+
+    function onMIDIMessage(event) {
+        const command = event.data[0] >> 4;
+        const note = event.data[1];
+        const velocity = event.data[2];
+
+        if (command === 9 && velocity > 0) { // Note On
+            currentlyPressedNotes.add(note % 12);
+        } else if (command === 8 || (command === 9 && velocity === 0)) { // Note Off
+            currentlyPressedNotes.delete(note % 12);
+        }
+
+        updatePlayedNotesDisplay();
+        verifyChord();
+    }
+
+    function updatePlayedNotesDisplay() {
+        const notes = Array.from(currentlyPressedNotes).map(noteNum => noteNames[noteNum]).join(', ');
+        playedNotes.textContent = `Played Notes: ${notes}`;
+    }
+
+    function setChordForVerification(chordName) {
+        chordToVerify = chordName;
+        verifyChord();
+    }
+
+    function getChordNotes(chordName) {
+        let rootNoteName = chordName.match(/^[A-G][#b]?/)[0];
+        let chordType = "Major";
+        if (chordName.includes('m') && !chordName.includes('dim')) {
+            chordType = "Minor";
+        } else if (chordName.includes('dim')) {
+            chordType = "Diminished";
+        }
+
+        const rootNote = noteNames.indexOf(rootNoteName);
+        if (rootNote === -1) return null;
+
+        const formula = chordFormulas[chordType];
+        if (!formula) return null;
+
+        return new Set(formula.map(interval => (rootNote + interval) % 12));
+    }
+
+    function verifyChord() {
+        if (!chordToVerify) {
+            chordVerification.textContent = '';
+            return;
+        }
+
+        const expectedNotes = getChordNotes(chordToVerify);
+        if (!expectedNotes) {
+            chordVerification.textContent = 'Unknown Chord';
+            return;
+        }
+
+        if (currentlyPressedNotes.size !== expectedNotes.size) {
+            chordVerification.textContent = 'Incorrect';
+            chordVerification.style.color = 'red';
+            return;
+        }
+
+        let match = true;
+        for (const note of currentlyPressedNotes) {
+            if (!expectedNotes.has(note)) {
+                match = false;
+                break;
+            }
+        }
+
+        if (match) {
+            chordVerification.textContent = 'Correct!';
+            chordVerification.style.color = 'green';
+        } else {
+            chordVerification.textContent = 'Incorrect';
+            chordVerification.style.color = 'red';
+        }
+    }
+
+    midiInputSelect.addEventListener('change', (event) => {
+        setActiveMidiInput(event.target.value);
+    });
+
     // Initial setup
     createVisualMetronome();
     updateDiatonicChords();
+
+    // Initialize MIDI
+    if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess({ sysex: false }).then(onMIDISuccess, onMIDIFailure);
+    } else {
+        midiStatus.textContent = 'Web MIDI API is not supported in this browser.';
+    }
 });

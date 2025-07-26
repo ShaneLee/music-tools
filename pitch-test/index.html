@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Test</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Pitch Test</h1>
+    <div id="score">
+        <span>Correct: <span id="correct-count">0</span></span>
+        <span>Incorrect: <span id="incorrect-count">0</span></span>
+    </div>
+    <div id="test-selector">
+        <label><input type="radio" name="test-type" value="perfect" checked> Perfect Pitch</label>
+        <label><input type="radio" name="test-type" value="relative"> Relative Pitch</label>
+    </div>
+    <div id="test-area">
+        <button id="play-note">Play Note</button>
+        <button id="play-again">Play Again</button>
+        <p id="reference-note-display"></p>
+        <div id="options"></div>
+        <p id="result"></p>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.2.7/Tone.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

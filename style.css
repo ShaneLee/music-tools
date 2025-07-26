@@ -24,6 +24,7 @@ div {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 button {
@@ -80,6 +81,28 @@ p {
     color: #007bff;
 }
 
+
+#chord-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+
+#chord-list li {
+    background-color: #eee;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#midi-controls p {
+    font-size: 1em;
+    font-weight: normal;
+    color: #333;
+}
+
 #visual-metronome {
     display: flex;
     justify-content: center;
@@ -97,4 +120,18 @@ p {
 
 .beat-box.active {
     background-color: #007bff;
+}
+
+#pitch-test-link a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+#pitch-test-link a:hover {
+    background-color: #218838;
 }
